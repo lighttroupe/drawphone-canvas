@@ -248,11 +248,15 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 
 	//
-	// Pen Size widget callbacks
+	// Pen Size helpers
 	//
 	pen_size.xToProgress = function(x) {
 		return clamp((((x / (pen_size.node.width+1)) - 0.1) / 0.8), 0.0, 1.0);
 	};
+
+	//
+	// Pen Size callbacks
+	//
 	pen_size.node.onmousedown = function(e) {
 		var x = e.pageX - $(this).offset().left;
 		set_pen_size(pen_size.xToProgress(x));
