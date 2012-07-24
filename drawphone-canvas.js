@@ -16,19 +16,16 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	canvas.fillColor = '#000000';
 	canvas.node = canvas_node;
 	canvas.context = canvas_node.getContext('2d');
-	canvas.node.width = canvas_node.width;
-	canvas.node.height = canvas_node.height;
 	canvas.radius = 0.1;
 	canvas.lastUpdate = 0;
 
 	var palette = {};
 	palette.node = palette_node;
-	palette.node.width = palette_image.width;
-	palette.node.height = palette_image.height;
 	palette.context = palette_node.getContext('2d');
 	palette.render = function() {
 		palette.context.drawImage(palette_image, 0, 0);
 
+		// Draw crosshair over selected color
 		if(palette.latestX) {
 			palette.context.beginPath();
 			palette.context.strokeStyle = "#fff";
@@ -52,14 +49,10 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	var current_color = {};
 	current_color.fillColor = canvas.fillColor;
 	current_color.node = current_color_node;
-	current_color.node.width = current_color_node.width;
-	current_color.node.height = current_color_node.height;
 	current_color.context = current_color_node.getContext('2d');
 
 	var pen_size = {};
 	pen_size.node = pen_size_node;
-	pen_size.node.width = pen_size_node.width;
-	pen_size.node.height = pen_size_node.height;
 	pen_size.context = pen_size_node.getContext('2d');
 	pen_size.render = function() {
 		pen_size.context.fillStyle = "#fff";
@@ -112,8 +105,8 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 		return result.toUpperCase();
 	};
 	setCurrentColor = function(color) {
-		canvas.fillColor = color;						// set
-		current_color.fillColor = color;		// save
+		canvas.fillColor = color;
+		current_color.fillColor = color;
 
 		// GUI feedback
 		current_color.context.clear();
