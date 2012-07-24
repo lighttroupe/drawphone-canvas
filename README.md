@@ -19,3 +19,9 @@ Wanted features:
 - Support drawing within (pen radius) pixels of the canvas
 
 Pull requests welcome and will make it to the website!
+
+How To Play
+-----------
+
+1. Clone this repository
+2. Open canvas.html in a browser
