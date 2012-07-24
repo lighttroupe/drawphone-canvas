@@ -16,5 +16,6 @@ Wanted features:
 - Cursor that shows pen size
 - Eraser
 - More pen options
+- Support drawing within (pen radius) pixels of the canvas
 
 Pull requests welcome and will make it to the website!
