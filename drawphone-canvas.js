@@ -40,7 +40,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 			palette.context.stroke();
 		}
 	};
-	palette.render();
 	palette.hideCrosshairs = function() {
 		palette.latestX = null;
 		palette.render();
@@ -84,7 +83,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 
 	//
-	// Helper Methods
+	// Canvas methods
 	//
 	canvas.context.fillCircle = function(x, y, radius, fillColor) {
 			canvas.context.fillStyle = fillColor;
@@ -121,7 +120,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 
 	//
-	// Keyboard Events
+	// Keyboard callbacks
 	//
 	document.onkeydown = function(e) {
 		if(e.keyCode == KEYCODE_LEFT_BRACKET && canvas.radius < 1.0) {
@@ -136,8 +135,9 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 		// Holding down the ] key while drawing should cause ever-larger circles
 		canvas.context.fillCircle(canvas.previousX, canvas.previousY, canvas.pixelRadius(), canvas.fillColor);
 	};
+
 	//
-	// Add mouse callbacks
+	// Canvas callbacks
 	//
 	canvas.node.onmousedown = function(e) {
 			//e.target.setCapture();
@@ -240,7 +240,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 
 	//
-	// Current Color callbacks
+	// Current Color methods
 	//
 	current_color.context.clear = function() {
 		this.fillStyle = current_color.fillColor;
@@ -274,5 +274,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	// Clear
 	current_color.context.clear();
 	pen_size.render();
+	palette.render();
+
 	// Keep canvas transparent ... canvas.context.clearTo("#FCFCFC");
 }
