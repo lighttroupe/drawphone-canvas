@@ -1,0 +1,360 @@
+//
+// DrawPhone.com drawpad written by Ian McIntosh <ian@openanswers.org>
+//
+// You are free to use this code for any purpose. Please credit DrawPhone.com with a link.
+//
+function initialize_drawing_canvas(canvas_node, palette_node, palette_image, current_color_node, pen_size_node)
+{
+	clamp = function(value, min, max) {
+		if(value < min) { return min; } else if(value > max) { return max; } else{ return value; }
+	};
+
+	var canvas = {};
+	canvas.fillColor = '#000000';
+	canvas.node = canvas_node;
+	canvas.context = canvas_node.getContext('2d');
+	canvas.node.width = canvas_node.width;
+	canvas.node.height = canvas_node.height;
+	canvas.radius = 0.1;
+	canvas.lastUpdate = 0;
+
+	var palette = {};
+	palette.node = palette_node;
+	palette.node.width = palette_image.width;
+	palette.node.height = palette_image.height;
+	palette.context = palette_node.getContext('2d');
+	palette.render = function() {
+		palette.context.drawImage(palette_image, 0, 0);
+
+		if(palette.latestX) {
+			palette.context.beginPath();
+			palette.context.strokeStyle = "#fff";
+			palette.context.moveTo(palette.latestX - 4.0, palette.latestY);
+			palette.context.lineTo(palette.latestX - (palette.node.width), palette.latestY);
+			palette.context.moveTo(palette.latestX + 4.0, palette.latestY);
+			palette.context.lineTo(palette.latestX + (palette.node.width), palette.latestY);
+			palette.context.moveTo(palette.latestX, palette.latestY - 4.0);
+			palette.context.lineTo(palette.latestX, palette.latestY - (palette.node.height));
+			palette.context.moveTo(palette.latestX, palette.latestY + 4.0);
+			palette.context.lineTo(palette.latestX, palette.latestY + (palette.node.height));
+			palette.context.stroke();
+		}
+	};
+	palette.render();
+	palette.hideCrosshairs = function() {
+		palette.latestX = null;
+		palette.render();
+	};
+
+	var current_color = {};
+	current_color.fillColor = canvas.fillColor;
+	current_color.node = current_color_node;
+	current_color.node.width = current_color_node.width;
+	current_color.node.height = current_color_node.height;
+	current_color.context = current_color_node.getContext('2d');
+
+	var pen_size = {};
+	pen_size.node = pen_size_node;
+	pen_size.node.width = pen_size_node.width;
+	pen_size.node.height = pen_size_node.height;
+	pen_size.context = pen_size_node.getContext('2d');
+	pen_size.render = function() {
+		pen_size.context.fillStyle = "#fff";
+		pen_size.context.fillRect(0, 0, pen_size.node.width, pen_size.node.height);
+
+		// Draw pen size slider < shape
+		pen_size.context.beginPath();
+		pen_size.context.fillStyle = "#333";
+		pen_size.context.moveTo(0.1 * pen_size.node.width, 0.53 * pen_size.node.height);
+		pen_size.context.lineTo(0.1 * pen_size.node.width, 0.47 * pen_size.node.height);
+		pen_size.context.lineTo(0.9 * pen_size.node.width, 0.30 * pen_size.node.height);
+		pen_size.context.lineTo(0.9 * pen_size.node.width, 0.60 * pen_size.node.height);
+		pen_size.context.fill();
+
+		var x = (0.1 * pen_size.node.width) + (canvas.radius * pen_size.node.width * 0.8);
+		var y = 0.5 * pen_size.node.height;
+
+		pen_size.context.fillStyle = "#000";
+		pen_size.context.beginPath();
+		pen_size.context.moveTo(x, y);
+		pen_size.context.arc(x, y, 6.0 + canvas.radius * 8, 0, Math.PI * 2, false);
+		pen_size.context.fill();
+
+		pen_size.context.fillStyle = canvas.fillColor;
+		pen_size.context.beginPath();
+		pen_size.context.moveTo(x, y);
+		pen_size.context.arc(x, y, 4.0 + canvas.radius * 8, 0, Math.PI * 2, false);
+		pen_size.context.fill();
+	};
+
+	//
+	// Helper Methods
+	//
+	canvas.context.fillCircle = function(x, y, radius, fillColor) {
+			canvas.context.fillStyle = fillColor;
+			canvas.context.beginPath();
+			canvas.context.moveTo(x, y);
+			canvas.context.arc(x, y, radius, 0, Math.PI * 2, false);
+			canvas.context.fill();
+	};
+	canvas.context.clearTo = function(fillColor) {
+			canvas.context.fillStyle = fillColor;
+			canvas.context.fillRect(0, 0, canvas.node.width, canvas.node.height);
+	};
+	intToHex = function(dec) {
+		var result = (parseInt(dec).toString(16));
+		if(result.length == 1) {
+			result = ("0" + result);
+		}
+		return result.toUpperCase();
+	};
+	setCurrentColor = function(color) {
+		canvas.fillColor = color;						// set
+		current_color.fillColor = color;		// save
+
+		// GUI feedback
+		current_color.context.clear();
+		pen_size.render();
+	};
+	set_pen_size = function(size) {
+		canvas.radius = size;
+		pen_size.render();
+	};
+	canvas.pixelRadius = function() {
+		return 0.5 + (canvas.radius * 50.0);
+	};
+
+	//
+	// Keyboard Events
+	//
+	document.onkeydown = function(e) {
+		key = keycodeToString(e.keyCode);
+			//alert(key);
+		if(key == '] }' && canvas.radius < 1.0) {
+			canvas.radius = clamp(canvas.radius + 0.05, 0.0, 1.0);
+			pen_size.render();
+		}
+		if(key == '[ {' && canvas.radius > 0.0) {
+			canvas.radius = clamp(canvas.radius - 0.05, 0.0, 1.0);
+			pen_size.render();
+		}
+
+		// Holding down the ] key while drawing should cause ever-larger circles
+		canvas.context.fillCircle(canvas.previousX, canvas.previousY, canvas.pixelRadius(), canvas.fillColor);
+	};
+	//
+	// Add mouse callbacks
+	//
+	canvas.node.onmousedown = function(e) {
+			//e.target.setCapture();
+			canvas.lastUpdate = e.timeStamp;
+
+			var x = e.pageX - $(this).offset().left;
+			var y = e.pageY - $(this).offset().top;
+
+			if(e.altKey || e.ctrlKey) {
+				// Picking by Alt-click or Ctrl-click
+				data = canvas.context.getImageData(x, y, 1, 1).data;
+				setCurrentColor("#" + intToHex(data[0]) + intToHex(data[1]) + intToHex(data[2]));
+				palette.hideCrosshairs();
+			} else if(e.shiftKey) {
+				
+			} else {
+				// Draw the first point
+				canvas.isDrawing = true;
+				canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
+			}
+	};
+	canvas.node.onmousemove = function(e) {
+			if(canvas.isDrawing) {
+				var x = e.pageX - $(this).offset().left;
+				var y = e.pageY - $(this).offset().top;
+
+				var deltaX = (x - canvas.previousX);
+				var deltaY = (y - canvas.previousY);
+				var delta = Math.sqrt((deltaX*deltaX) + (deltaY*deltaY));
+				var timeDelta = (e.timeStamp - canvas.lastUpdate);
+
+				if(timeDelta > 100) {		// && delta > 8.0) {
+					// Avoid drawing when there's a big lag and a big gap (probably due to Javascript GC)
+				}
+				else {
+					if(canvas.previousX != false) {
+						// from previous to current
+						numPoints = 32;
+						for(i=0 ; i<numPoints ; i++) {
+							canvas.context.fillCircle((canvas.previousX + (i+1) * ((x-canvas.previousX) / numPoints)), (canvas.previousY + (i+1) * ((y-canvas.previousY) / numPoints)), canvas.pixelRadius(), canvas.fillColor);
+						}
+					}
+					else {
+						canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
+					}
+				}
+				canvas.lastUpdate = e.timeStamp;
+			}
+			canvas.previousX = x;
+			canvas.previousY = y;
+	};
+	canvas.node.onmouseup = function(e) {
+		//document.releaseCapture();
+		canvas.isDrawing = false;
+	};
+	//canvas.node.onlosecapture = function(e) {
+	//	canvas.isDrawing = false;
+	//};
+
+	// Also stop drawing when the page sees a mouseup
+	document.body.onmouseup = function(e) {
+		//document.releaseCapture();
+		canvas.isDrawing = false;
+	};
+	canvas.node.onmouseover = function(e) {
+		var x = e.pageX - $(this).offset().left;
+		var y = e.pageY - $(this).offset().top;
+		canvas.previousX = x;
+		canvas.previousY = y;
+	};
+	canvas.node.onmouseout = function(e) {
+	};
+
+	//
+	// Palette callbacks
+	//
+	palette.node.onmousemove = function(e) {
+		var x = e.pageX - $(this).offset().left;
+		var y = e.pageY - $(this).offset().top;
+		palette.latestX = x;
+		palette.latestY = y;
+
+		if(palette.isPicking) {
+			data = palette.context.getImageData(palette.latestX, palette.latestY, 1, 1).data;
+			setCurrentColor("#" + intToHex(data[0]) + intToHex(data[1]) + intToHex(data[2]));
+			palette.render();
+		}
+	};
+	palette.node.onmousedown = function(e) {
+		palette.isPicking = true;
+		data = palette.context.getImageData(palette.latestX, palette.latestY, 1, 1).data;
+		setCurrentColor("#" + intToHex(data[0]) + intToHex(data[1]) + intToHex(data[2]));
+		palette.render();
+	};
+	palette.node.onmouseup = function(e) {
+		palette.isPicking = false;
+	};
+	palette.node.onmouseout = function(e) {
+		palette.isPicking = false;
+	};
+
+	//
+	// Current Color callbacks
+	//
+	current_color.context.clear = function() {
+		this.fillStyle = current_color.fillColor;
+		this.fillRect(0, 0, current_color.node.width, current_color.node.height);
+	};
+
+	//
+	// Pen Size widget callbacks
+	//
+	pen_size.xToProgress = function(x) {
+		return clamp((((x / (pen_size.node.width+1)) - 0.1) / 0.8), 0.0, 1.0);
+	};
+	pen_size.node.onmousedown = function(e) {
+		var x = e.pageX - $(this).offset().left;
+		set_pen_size(pen_size.xToProgress(x));
+		pen_size.mouseDown = true;
+	};
+	pen_size.node.onmousemove = function(e) {
+		if(pen_size.mouseDown) {
+			var x = e.pageX - $(this).offset().left;
+			set_pen_size(pen_size.xToProgress(x));
+		}
+	};
+	pen_size.node.onmouseup = function(e) {
+		pen_size.mouseDown = false;
+	};
+	pen_size.node.onmouseout = function(e) {
+		pen_size.mouseDown = false;
+	};
+
+	// Clear
+	current_color.context.clear();
+	pen_size.render();
+	// Keep canvas transparent ... canvas.context.clearTo("#FCFCFC");
+}
+
+// Helper method copied in from somewhere
+function keycodeToString(n)
+{
+	if( 47<=n && n<=90 ) return unescape('%'+(n).toString(16))
+	if( 96<=n && n<=105) return 'NUM '+(n-96)
+	if(112<=n && n<=135) return 'F'+(n-111)
+
+	if(n==3)  return 'Cancel' //DOM_VK_CANCEL
+	if(n==6)  return 'Help'   //DOM_VK_HELP
+	if(n==8)  return 'Backspace'
+	if(n==9)  return 'Tab'
+	if(n==12) return 'NUM 5'  //DOM_VK_CLEAR
+	if(n==13) return 'Enter'
+	if(n==16) return 'Shift'
+	if(n==17) return 'Ctrl'
+	if(n==18) return 'Alt'
+	if(n==19) return 'Pause|Break'
+	if(n==20) return 'CapsLock'
+	if(n==27) return 'Esc'
+	if(n==32) return 'Space'
+	if(n==33) return 'PageUp'
+	if(n==34) return 'PageDown'
+	if(n==35) return 'End'
+	if(n==36) return 'Home'
+	if(n==37) return 'Left Arrow'
+	if(n==38) return 'Up Arrow'
+	if(n==39) return 'Right Arrow'
+	if(n==40) return 'Down Arrow'
+	if(n==42) return '*' //Opera
+	if(n==43) return '+' //Opera
+	if(n==44) return 'PrntScrn'
+	if(n==45) return 'Insert'
+	if(n==46) return 'Delete'
+
+	if(n==91) return 'WIN Start'
+	if(n==92) return 'WIN Start Right'
+	if(n==93) return 'WIN Menu'
+	if(n==106) return '*'
+	if(n==107) return '+'
+	if(n==108) return 'Separator' //DOM_VK_SEPARATOR
+	if(n==109) return '-'
+	if(n==110) return '.'
+	if(n==111) return '/'
+	if(n==144) return 'NumLock'
+	if(n==145) return 'ScrollLock'
+
+	//Media buttons (Inspiron laptops) 
+	if(n==173) return 'Media Mute On|Off'
+	if(n==174) return 'Media Volume Down'
+	if(n==175) return 'Media Volume Up'
+	if(n==176) return 'Media >>'
+	if(n==177) return 'Media <<'
+	if(n==178) return 'Media Stop'
+	if(n==179) return 'Media Pause|Resume'
+
+	if(n==182) return 'WIN My Computer'
+	if(n==183) return 'WIN Calculator'
+	if(n==186) return '; :'
+	if(n==187) return '= +'
+	if(n==188) return ', <'
+	if(n==189) return '- _'
+	if(n==190) return '. >'
+	if(n==191) return '/ ?'
+	if(n==192) return '\` ~'
+	if(n==219) return '[ {'
+	if(n==220) return '\\ |'
+	if(n==221) return '] }'
+	if(n==222) return '\' "'
+	if(n==224) return 'META|Command'
+	if(n==229) return 'WIN IME'
+
+	if(n==255) return 'Device-specific' //Dell Home button (Inspiron laptops)
+
+	return null
+}

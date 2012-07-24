@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>DrawPhone.com Canvas Sandbox</title>
+		<meta name="description" content="" />
+		<link href='http://fonts.googleapis.com/css?family=Gloria+Hallelujah' rel='stylesheet' type='text/css'>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+		<script src="drawphone-canvas.js?1343108257" type="text/javascript"></script>
+
+		<style>
+			body { background-color: #f8f8f8; }
+			#drawing_canvas { background-color: white; }
+		</style>
+	</head>
+
+	<body>
+		<div style="margin:25px;">
+			<h1>DrawPhone Canvas Tester</h1>
+			<div id="drawing_canvas_container">
+				<canvas id="drawing_canvas" width="800" height="400" style="border-width:thin; border-style:solid; cursor:crosshair;"></canvas>
+				<div><strong>Alt-Click</strong> to pick color from canvas.</small></div>
+			</div>
+
+			<div>
+				<img id="drawing_palette_image" src="palette.png" style="display:none;" />
+
+				<div id="drawing_palette_container" style="float:left; cursor:crosshair;">
+					<canvas id="drawing_palette" width="800" height="100" style="border-width:thin; border-style:solid;"></canvas>
+				</div>
+
+				<div id="drawing_current_color_container" style="float:left; margin-left: 16px;  margin-bottom: 16px; display:none;">
+					<canvas id="drawing_current_color" width="32" height="32" style="border-width:thin; border-style:solid;"></canvas>
+				</div>
+
+				<div id="drawing_pen_size_container" style="float:left; margin-left: 16px; cursor:pointer;">
+					<canvas id="drawing_pen_size" width="265" height="32" style="border-width:thin; border-style:solid;"></canvas>
+					<div><strong>[</strong> and <strong>]</strong> to change pen size.</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$(document).ready(function() { initialize_drawing_canvas(document.getElementById('drawing_canvas'), document.getElementById('drawing_palette'), document.getElementById('drawing_palette_image'), document.getElementById('drawing_current_color'), document.getElementById('drawing_pen_size')); });
+</script>
