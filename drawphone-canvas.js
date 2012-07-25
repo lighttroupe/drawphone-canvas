@@ -3,14 +3,15 @@
 //
 // You are free to use this code for any purpose. Please credit DrawPhone.com with a link.
 //
+
+function clamp(value, min, max) {
+	if(value < min) { return min; } else if(value > max) { return max; } else{ return value; }
+}
+
 function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen_size_node)
 {
 	var KEYCODE_LEFT_BRACKET = 221;
 	var KEYCODE_RIGHT_BRACKET = 219;
-
-	clamp = function(value, min, max) {
-		if(value < min) { return min; } else if(value > max) { return max; } else{ return value; }
-	};
 
 	var canvas = {};
 	canvas.fillColor = '#000000';
