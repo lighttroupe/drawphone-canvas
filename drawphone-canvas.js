@@ -171,7 +171,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 			else {
 				if(canvas.previousX != false) {
 					// from previous to current
-					var frequency = 2;		// number of times to stamp circle per 'radius' pixels the pen travels
+					var frequency = 3;		// number of times to stamp circle per 'radius' pixels the pen travels
 					var numPoints = clamp(((delta / canvas.pixelRadius()) * frequency), 1, 30);
 					for(i=0 ; i<numPoints ; i++) {
 						canvas.context.fillCircle((canvas.previousX + (i+1) * ((x-canvas.previousX) / numPoints)), (canvas.previousY + (i+1) * ((y-canvas.previousY) / numPoints)), canvas.pixelRadius(), canvas.fillColor);
