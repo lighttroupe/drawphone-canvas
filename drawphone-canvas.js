@@ -258,10 +258,11 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 		pen_size.mouseDown = false;
 	};
 
-	// Clear
+	//
+	// Render everything once to begin
+	//
 	current_color.context.clear();
 	pen_size.render();
 	palette.render();
-
 	// Keep canvas transparent ... canvas.context.clearTo("#FCFCFC");
 }
