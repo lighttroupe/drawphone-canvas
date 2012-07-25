@@ -24,9 +24,10 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 	palette.node = palette_node;
 	palette.context = palette_node.getContext('2d');
 	palette.render = function() {
+		// Draw background image (the palette itself)
 		palette.context.drawImage(palette_image, 0, 0);
 
-		// Draw crosshair over selected color
+		// Draw crosshair on selected color
 		if(palette.latestX) {
 			palette.context.beginPath();
 			palette.context.strokeStyle = "#fff";
@@ -62,6 +63,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 		pen_size.context.lineTo(0.9 * pen_size.node.width, 0.60 * pen_size.node.height);
 		pen_size.context.fill();
 
+		// Draw handle (with current fillColor inside it)
 		var x = (0.1 * pen_size.node.width) + (canvas.radius * pen_size.node.width * 0.8);
 		var y = 0.5 * pen_size.node.height;
 
