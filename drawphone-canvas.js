@@ -180,10 +180,10 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 					canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
 				}
 			}
+			canvas.previousX = x;
+			canvas.previousY = y;
 			canvas.lastUpdate = e.timeStamp;
 		}
-		canvas.previousX = x;
-		canvas.previousY = y;
 	};
 	// Pipe mouse messages from the whole page to the canvas
 	document.body.onmousemove = function(e) { return canvas.node.mouseMoveHandler(e); };
