@@ -82,15 +82,15 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 	// Canvas methods
 	//
 	canvas.context.fillCircle = function(x, y, radius, fillColor) {
-			canvas.context.fillStyle = fillColor;
-			canvas.context.beginPath();
-			canvas.context.moveTo(x, y);
-			canvas.context.arc(x, y, radius, 0, Math.PI * 2, false);
-			canvas.context.fill();
+		canvas.context.fillStyle = fillColor;
+		canvas.context.beginPath();
+		canvas.context.moveTo(x, y);
+		canvas.context.arc(x, y, radius, 0, Math.PI * 2, false);
+		canvas.context.fill();
 	};
 	canvas.context.clearTo = function(fillColor) {
-			canvas.context.fillStyle = fillColor;
-			canvas.context.fillRect(0, 0, canvas.node.width, canvas.node.height);
+		canvas.context.fillStyle = fillColor;
+		canvas.context.fillRect(0, 0, canvas.node.width, canvas.node.height);
 	};
 	intToHex = function(dec) {
 		var result = (parseInt(dec).toString(16));
@@ -134,53 +134,53 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 	// Canvas callbacks
 	//
 	canvas.node.onmousedown = function(e) {
-			canvas.lastUpdate = e.timeStamp;
+		canvas.lastUpdate = e.timeStamp;
 
+		var x = e.pageX - $(this).offset().left;
+		var y = e.pageY - $(this).offset().top;
+
+		if(e.altKey || e.ctrlKey) {
+			// Picking by Alt-click or Ctrl-click
+			data = canvas.context.getImageData(x, y, 1, 1).data;
+			setCurrentColor("#" + intToHex(data[0]) + intToHex(data[1]) + intToHex(data[2]));
+			palette.hideCrosshairs();
+		} else if(e.shiftKey) {
+
+		} else {
+			// Draw the first point
+			canvas.isDrawing = true;
+			canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
+		}
+	};
+	canvas.node.mouseMoveHandler = function(e) {
+		if(canvas.isDrawing) {
 			var x = e.pageX - $(this).offset().left;
 			var y = e.pageY - $(this).offset().top;
 
-			if(e.altKey || e.ctrlKey) {
-				// Picking by Alt-click or Ctrl-click
-				data = canvas.context.getImageData(x, y, 1, 1).data;
-				setCurrentColor("#" + intToHex(data[0]) + intToHex(data[1]) + intToHex(data[2]));
-				palette.hideCrosshairs();
-			} else if(e.shiftKey) {
-				
-			} else {
-				// Draw the first point
-				canvas.isDrawing = true;
-				canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
+			var deltaX = (x - canvas.previousX);
+			var deltaY = (y - canvas.previousY);
+			var delta = Math.sqrt((deltaX*deltaX) + (deltaY*deltaY));
+			var timeDelta = (e.timeStamp - canvas.lastUpdate);
+
+			if(timeDelta > 100) {		// && delta > 8.0) {
+				// Avoid drawing when there's a big lag and a big gap (probably due to Javascript GC)
 			}
-	};
-	canvas.node.mouseMoveHandler = function(e) {
-			if(canvas.isDrawing) {
-				var x = e.pageX - $(this).offset().left;
-				var y = e.pageY - $(this).offset().top;
-
-				var deltaX = (x - canvas.previousX);
-				var deltaY = (y - canvas.previousY);
-				var delta = Math.sqrt((deltaX*deltaX) + (deltaY*deltaY));
-				var timeDelta = (e.timeStamp - canvas.lastUpdate);
-
-				if(timeDelta > 100) {		// && delta > 8.0) {
-					// Avoid drawing when there's a big lag and a big gap (probably due to Javascript GC)
+			else {
+				if(canvas.previousX != false) {
+					// from previous to current
+					numPoints = 32;
+					for(i=0 ; i<numPoints ; i++) {
+						canvas.context.fillCircle((canvas.previousX + (i+1) * ((x-canvas.previousX) / numPoints)), (canvas.previousY + (i+1) * ((y-canvas.previousY) / numPoints)), canvas.pixelRadius(), canvas.fillColor);
+					}
 				}
 				else {
-					if(canvas.previousX != false) {
-						// from previous to current
-						numPoints = 32;
-						for(i=0 ; i<numPoints ; i++) {
-							canvas.context.fillCircle((canvas.previousX + (i+1) * ((x-canvas.previousX) / numPoints)), (canvas.previousY + (i+1) * ((y-canvas.previousY) / numPoints)), canvas.pixelRadius(), canvas.fillColor);
-						}
-					}
-					else {
-						canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
-					}
+					canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
 				}
-				canvas.lastUpdate = e.timeStamp;
 			}
-			canvas.previousX = x;
-			canvas.previousY = y;
+			canvas.lastUpdate = e.timeStamp;
+		}
+		canvas.previousX = x;
+		canvas.previousY = y;
 	};
 	// Pipe mouse messages from the whole page to the canvas
 	document.body.onmousemove = function(e) { return canvas.node.mouseMoveHandler(e); };
