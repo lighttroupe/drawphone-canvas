@@ -140,7 +140,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	// Canvas callbacks
 	//
 	canvas.node.onmousedown = function(e) {
-			//e.target.setCapture();
 			canvas.lastUpdate = e.timeStamp;
 
 			var x = e.pageX - $(this).offset().left;
@@ -159,7 +158,7 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 				canvas.context.fillCircle(x, y, canvas.pixelRadius(), canvas.fillColor);
 			}
 	};
-	canvas.node.onmousemove = function(e) {
+	canvas.node.mouseMoveHandler = function(e) {
 			if(canvas.isDrawing) {
 				var x = e.pageX - $(this).offset().left;
 				var y = e.pageY - $(this).offset().top;
@@ -189,26 +188,10 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 			canvas.previousX = x;
 			canvas.previousY = y;
 	};
-	canvas.node.onmouseup = function(e) {
-		//document.releaseCapture();
-		canvas.isDrawing = false;
-	};
-	//canvas.node.onlosecapture = function(e) {
-	//	canvas.isDrawing = false;
-	//};
-
-	// Also stop drawing when the page sees a mouseup
+	// Pipe mouse messages from the whole page to the canvas
+	document.body.onmousemove = function(e) { return canvas.node.mouseMoveHandler(e); };
 	document.body.onmouseup = function(e) {
-		//document.releaseCapture();
 		canvas.isDrawing = false;
-	};
-	canvas.node.onmouseover = function(e) {
-		var x = e.pageX - $(this).offset().left;
-		var y = e.pageY - $(this).offset().top;
-		canvas.previousX = x;
-		canvas.previousY = y;
-	};
-	canvas.node.onmouseout = function(e) {
 	};
 
 	//
