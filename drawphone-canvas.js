@@ -8,6 +8,14 @@ function clamp(value, min, max) {
 	if(value < min) { return min; } else if(value > max) { return max; } else{ return value; }
 }
 
+function intToHex(dec) {
+	var result = (parseInt(dec).toString(16));
+	if(result.length == 1) {
+		result = ("0" + result);
+	}
+	return result.toUpperCase();
+};
+
 function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen_size_node)
 {
 	var KEYCODE_LEFT_BRACKET = 221;
@@ -93,13 +101,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen
 	canvas.context.clearTo = function(fillColor) {
 		canvas.context.fillStyle = fillColor;
 		canvas.context.fillRect(0, 0, canvas.node.width, canvas.node.height);
-	};
-	intToHex = function(dec) {
-		var result = (parseInt(dec).toString(16));
-		if(result.length == 1) {
-			result = ("0" + result);
-		}
-		return result.toUpperCase();
 	};
 	setCurrentColor = function(color) {
 		canvas.fillColor = color;
