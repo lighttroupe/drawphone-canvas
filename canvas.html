@@ -28,10 +28,6 @@
 					<canvas id="drawing_palette" width="512" height="128" style="border-width:thin; border-style:solid;"></canvas>
 				</div>
 
-				<div id="drawing_current_color_container" style="float:left; margin-left: 16px;  margin-bottom: 16px; display:none;">
-					<canvas id="drawing_current_color" width="32" height="32" style="border-width:thin; border-style:solid;"></canvas>
-				</div>
-
 				<div id="drawing_pen_size_container" style="float:left; margin-left: 16px; cursor:pointer;">
 					<canvas id="drawing_pen_size" width="265" height="32" style="border-width:thin; border-style:solid;"></canvas>
 					<div><strong>[</strong> and <strong>]</strong> to change pen size.</div>
@@ -42,5 +38,5 @@
 </html>
 
 <script type="text/javascript">
-	$(document).ready(function() { initialize_drawing_canvas(document.getElementById('drawing_canvas'), document.getElementById('drawing_palette'), document.getElementById('drawing_palette_image'), document.getElementById('drawing_current_color'), document.getElementById('drawing_pen_size')); });
+	$(document).ready(function() { initialize_drawing_canvas(document.getElementById('drawing_canvas'), document.getElementById('drawing_palette'), document.getElementById('drawing_palette_image'), document.getElementById('drawing_pen_size')); });
 </script>

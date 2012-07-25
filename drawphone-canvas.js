@@ -3,7 +3,7 @@
 //
 // You are free to use this code for any purpose. Please credit DrawPhone.com with a link.
 //
-function initialize_drawing_canvas(canvas_node, palette_node, palette_image, current_color_node, pen_size_node)
+function initialize_drawing_canvas(canvas_node, palette_node, palette_image, pen_size_node)
 {
 	var KEYCODE_LEFT_BRACKET = 221;
 	var KEYCODE_RIGHT_BRACKET = 219;
@@ -44,11 +44,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 		palette.latestX = null;
 		palette.render();
 	};
-
-	var current_color = {};
-	current_color.fillColor = canvas.fillColor;
-	current_color.node = current_color_node;
-	current_color.context = current_color_node.getContext('2d');
 
 	var pen_size = {};
 	pen_size.node = pen_size_node;
@@ -105,10 +100,8 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 	setCurrentColor = function(color) {
 		canvas.fillColor = color;
-		current_color.fillColor = color;
 
 		// GUI feedback
-		current_color.context.clear();
 		pen_size.render();
 	};
 	set_pen_size = function(size) {
@@ -223,14 +216,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	};
 
 	//
-	// Current Color methods
-	//
-	current_color.context.clear = function() {
-		this.fillStyle = current_color.fillColor;
-		this.fillRect(0, 0, current_color.node.width, current_color.node.height);
-	};
-
-	//
 	// Pen Size helpers
 	//
 	pen_size.xToProgress = function(x) {
@@ -261,7 +246,6 @@ function initialize_drawing_canvas(canvas_node, palette_node, palette_image, cur
 	//
 	// Render everything once to begin
 	//
-	current_color.context.clear();
 	pen_size.render();
 	palette.render();
 	// Keep canvas transparent ... canvas.context.clearTo("#FCFCFC");
